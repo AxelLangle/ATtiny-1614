@@ -23,7 +23,7 @@ void postTransmission() {
 }
 
 void setup() {
-  // Inicializamos el pin de control y lo ponemos en escucha por defecto
+  // Inicializamos el pin de control y lo ponemos en escucha por defecto    
   pinMode(MAX485_RE_NEG, OUTPUT);
   digitalWrite(MAX485_RE_NEG, LOW); 
 
@@ -46,19 +46,18 @@ void setup() {
 void loop() {
   uint8_t result;
   
-  // 3. La Petición Modbus
-  // El XY-MD03 guarda la Temperatura en el registro 1 y la Humedad en el 2.
-  // La instrucción "readInputRegisters(dirección_inicial, cantidad_de_registros)"
-  // le pide al sensor que nos devuelva 2 registros a partir del número 1.
-  // Cambiamos de Input a Holding y empezamos desde la dirección 0 a pedir 2 datos
+// 3. La Petición Modbus
+  // La instrucción le pide al sensor que nos devuelva 2 registros a partir de la dirección 1.
   result = node.readHoldingRegisters(0, 2); 
 
   // 4. Verificamos si la respuesta fue exitosa
   if (result == node.ku8MBSuccess) {
-    // El sensor envía los datos como números enteros sin decimales (ej. 254 en lugar de 25.4)
-    // Por eso, dividimos entre 10.0 para obtener el número real.
-    float temperatura = node.getResponseBuffer(0) / 10.0f;
-    float humedad = node.getResponseBuffer(1) / 10.0f;
+    
+    // getResponseBuffer(0) tiene el primer dato que pedimos (Registro 1 = humedad)
+    float humedad = node.getResponseBuffer(0) / 10.0f;
+    
+    // getResponseBuffer(1) tiene el segundo dato que pedimos (Registro 2 = temperatura)
+    float temperatura = node.getResponseBuffer(1) / 10.0f;
 
     // Imprimimos los resultados en el Monitor Serie
     Serial.print("Temperatura: ");
